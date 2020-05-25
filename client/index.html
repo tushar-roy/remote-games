@@ -1,0 +1,92 @@
+<body>
+
+<script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '552118152152913',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v7.0'
+      });
+        
+      FB.AppEvents.logPageView();   
+        
+    };
+  
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+
+    function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+        });
+    }
+
+  </script>
+
+    <h1>hello!</h1>
+    <fb:login-button scope="public_profile,email" onlogin="checkLoginState();"></fb:login-button>
+    <ul id="divPlayers"></ul>
+    <input id="txtUsername" placeholder="Enter your name..."/><button id="btnJoin">Join the Game!</button>
+    <canvas id="ctx" width="500px" height="400px" style="border:1px solid #000000"></canvas>
+
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script>
+    var socket = io();
+
+    $(document).ready(function(){
+
+        //UI functions
+        var UI = {
+            ctx: document.getElementById("ctx").getContext("2D"),
+            RefreshPlayerList: function( players ) {
+                $div = $("#divPlayers");
+                $div.html("<h2>Current Players</h2>");
+                //append("<li>" + _username + "</li>");
+                for(i in players) {
+                    $div.append("<ol>" + players[i].username + "</ol    >");
+                }
+            },
+            Init: function() {
+                //ctx = document.getElementById("ctx").getContext("2D");
+                //ctx.font = "30px Arial";
+                //ctx.clearRect(0,0,500,500);
+                //ctx.fillText("Hi!",100,100);
+            }
+        }
+
+        UI.Init();
+
+        //Listen to the server
+        socket.on('serverMsg', function(msg){
+            // switch(msg.type) {
+            //     case 'PlayerJoined':
+            //         UI.RefreshPlayers(msg.data);
+            //         break;
+            // }
+        });
+        socket.on('x', function(players){
+            console.log("welcome");
+            console.log(players);
+        });
+        socket.on('UpdatedPlayerList', function(players){
+            UI.RefreshPlayerList(players);
+        });
+
+        //Event Handlers
+        $("#btnJoin").click(function(){
+            username =  $("#txtUsername").val();
+            socket.emit('PlayerJoined', username );
+        });
+
+    });
+
+</script>
