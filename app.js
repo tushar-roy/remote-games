@@ -17,8 +17,8 @@ app.get('/', function(req, res) {
 
 app.use('/client', express.static(+__dirname + '/client'));
 
-serv.listen(2);
-console.log("Server started at port 2");
+serv.listen(2020);
+console.log("Server started at port 2020");
 
 ///Socket
 var io = require('socket.io')(serv,{});
